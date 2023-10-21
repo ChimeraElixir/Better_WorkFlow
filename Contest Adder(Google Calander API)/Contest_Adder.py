@@ -7,6 +7,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from httplib2 import Http
+import pandas as pd
+import numpy as np
+from datetime import datetime,timedelta
 
 
 SCOPES = ['https://www.googleapis.com/auth/calendar']
@@ -33,33 +36,45 @@ def main():
     try:
         # service = build('calendar', 'v3', credentials=creds)
         service = build('calendar', 'v3', credentials=creds)
-        event = {
-            'summary': 'First Add',
-            'location': 'Delhi',
-            'description': 'first contest add',
-            'start': {
-                'dateTime': '2023-10-23T13:00:00+05:30',
-                'timeZone': 'Asia/Kolkata',  # Corrected timezone name
-            },
-            'end': {
-                'dateTime': '2023-10-23T14:00:00+05:30',  # Corrected time format
-                'timeZone': 'Asia/Kolkata',
-            },
-            
-            'attendees': [
-                {'email': 'gaurav94266@gmail.com'},
-            ],
-            'reminders': {
-                'useDefault': False,
-                'overrides': [
-                    {'method': 'email', 'minutes': 24 * 60},
-                    {'method': 'popup', 'minutes': 10},
-                ],
-            },
-        }
 
-        event = service.events().insert(calendarId='primary', body=event).execute()
-        print(f"Event created: {event.get('htmlLink')}")
+        df=pd.read_excel("CodeforceCalander.xlsx")
+        Summary=df[' Name']
+        DateTime=df['Start']
+        hour= df['Length'].dt.hour
+        minute=df['Length'].dt.minute
+        for i in range(int(df.shape[0])):
+            start_time=datetime.strptime(DateTime[i],'%b/%d/%Y %H:%M')
+            end_time = start_time + timedelta(hours=int(hour[i]),minutes=int(minute[i]))
+
+            TimeZone='Asia/Kolkata'
+
+            event = {
+                'summary': str(Summary[i]),
+                'location': 'Delhi',
+                'description': str(Summary[i]),
+                'start': {
+                    'dateTime': start_time.strftime('%Y-%m-%dT%H:%M:%S'+'+5:30'),
+                    'timeZone': TimeZone,  # Corrected timezone name
+                },
+                'end': {
+                    'dateTime': end_time.strftime('%Y-%m-%dT%H:%M:%S'+'+5:30'),  # Corrected time format
+                    'timeZone': TimeZone,
+                },
+                
+                'attendees': [
+                    {'email': 'gaurav94266@gmail.com'},
+                ],
+                'reminders': {
+                    'useDefault': False,
+                    'overrides': [
+                        {'method': 'email', 'minutes': 24 * 60},
+                        {'method': 'popup', 'minutes': 30},
+                    ],
+                },
+            }
+
+            event = service.events().insert(calendarId='primary', body=event).execute()
+            print(f"Event created: {event.get('htmlLink')}")
 
     except HttpError as error:
         print('An error occurred: %s' % error)

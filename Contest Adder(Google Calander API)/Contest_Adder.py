@@ -35,45 +35,45 @@ def main():
 
     try:
         # service = build('calendar', 'v3', credentials=creds)
-        service = build('calendar', 'v3', credentials=creds)
+        service = build('calendar', 'v3',credentials=creds)
 
         df=pd.read_excel("CodeforceCalander.xlsx")
-        Summary=df[' Name']
+        Summary=df['Name']
         DateTime=df['Start']
         hour= df['Length'].dt.hour
         minute=df['Length'].dt.minute
-        for i in range(int(df.shape[0])):
+        for i in range(df.shape[0]):
             start_time=datetime.strptime(DateTime[i],'%b/%d/%Y %H:%M')
             end_time = start_time + timedelta(hours=int(hour[i]),minutes=int(minute[i]))
-
             TimeZone='Asia/Kolkata'
 
             event = {
-                'summary': str(Summary[i]),
-                'location': 'Delhi',
-                'description': str(Summary[i]),
-                'start': {
-                    'dateTime': start_time.strftime('%Y-%m-%dT%H:%M:%S'+'+5:30'),
-                    'timeZone': TimeZone,  # Corrected timezone name
-                },
-                'end': {
-                    'dateTime': end_time.strftime('%Y-%m-%dT%H:%M:%S'+'+5:30'),  # Corrected time format
-                    'timeZone': TimeZone,
-                },
-                
-                'attendees': [
-                    {'email': 'gaurav94266@gmail.com'},
-                ],
-                'reminders': {
-                    'useDefault': False,
-                    'overrides': [
-                        {'method': 'email', 'minutes': 24 * 60},
-                        {'method': 'popup', 'minutes': 30},
+            'summary': str(Summary[i]),
+            'location': 'Delhi',
+            'description': str(Summary[i]),
+            'start': {
+                'dateTime': str(start_time.strftime('%Y-%m-%dT%H:%M:%S'+'+05:30')),
+                'timeZone': 'Asia/Kolkata',  # Corrected timezone name
+            },
+            'end': {
+                'dateTime': str(end_time.strftime('%Y-%m-%dT%H:%M:%S'+'+05:30')),  # Corrected time format
+                'timeZone': 'Asia/Kolkata',
+            },
+            
+            'attendees': [
+                {'email': 'gaurav94266@gmail.com'},
+            ],
+            'reminders': {
+                'useDefault': False,
+                'overrides': [
+                    {'method': 'email', 'minutes': 24 * 60},
+                    {'method': 'popup', 'minutes': 10},
                     ],
                 },
             }
 
-            event = service.events().insert(calendarId='primary', body=event).execute()
+
+            event = service.events().insert(calendarId='primary',body=event).execute()
             print(f"Event created: {event.get('htmlLink')}")
 
     except HttpError as error:

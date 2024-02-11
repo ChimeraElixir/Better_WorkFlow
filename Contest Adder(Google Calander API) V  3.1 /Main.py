@@ -37,20 +37,21 @@ def main():
         # service = build('calendar', 'v3', credentials=creds)
         service = build("calendar", "v3", credentials=creds)
 
-        df = pd.read_csv("./Web Scraping/CodeforcesContests.csv")
+        df = pd.read_csv("CodeforcesContests.csv")
         # print(df)
         Summary = df["Name"]
         DateTime = df["Start"]
-        hour = df["ContestHour"]
-        minute = df["ContestMinutes"]
-
+        Length = df["Length"]
 
         for i in range(df.shape[0]):
-            start_time = datetime.strptime(DateTime[i], "%b/%d/%Y %H:%M")
-            end_time = start_time + timedelta(
-                hours=int(hour[i]), minutes=int(minute[i])
-            )
+            start_time = datetime.strptime(DateTime[i], "%Y-%m-%d %H:%M:%S")
 
+            hour, minute = Length[i].split(":")
+
+            end_time = start_time + timedelta(
+                hours=int(hour), minutes=int(minute)
+            )
+            
             TimeZone = "Asia/Kolkata"
 
             events_result = (
@@ -65,11 +66,7 @@ def main():
                 .execute()
             )
 
-
-
             event = events_result["items"]
-
-
 
             # event = events_result.get("items", [])
 
@@ -127,7 +124,6 @@ def main():
             #         }
             #     ],
             # }
-            
 
             if (not(len(event))) or event[0]["summary"] != Summary[i]:
                 event = {
@@ -144,7 +140,7 @@ def main():
                         "dateTime": str(
                             end_time.strftime("%Y-%m-%dT%H:%M:%S" + "+05:30")
                         ),  # Corrected time format
-                        "timeZone": "Asia/Kolkata",
+                        "timeZone": TimeZone,
                     },
                     "attendees": [
                         {"email": "gaurav94266@gmail.com"},

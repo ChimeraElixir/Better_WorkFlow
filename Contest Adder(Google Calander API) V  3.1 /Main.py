@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-API_KEY = "AIzaSyBbzLoF1y_ktgaosxqQyChJyACBoUOeOVo"
+API_KEY = ""
 
 
 def main():

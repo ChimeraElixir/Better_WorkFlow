@@ -13,7 +13,7 @@ sys.stdout = open("output.txt", "w")
 
 contestNames = []
 DateTime = []
-length=[]
+length = []
 lengthHour = []
 lengthMinute = []
 
@@ -24,13 +24,11 @@ table = soup.find("table").find_all("tr")[1:]
 
 for row in table:
     columns = row.find_all("td")
-    
+
     contestNames.append(columns[0].text.strip())
-    
 
     start_time = columns[2].text.strip()
-    
-   
+
     start_time = datetime.strptime(start_time, "%b/%d/%Y %H:%M")
     start_time = start_time + timedelta(hours=2, minutes=30)
 
@@ -43,13 +41,7 @@ for row in table:
 # print(lengthMinute)
 
 
-df = pd.DataFrame(
-    {
-        "Name": contestNames,
-        "Start": DateTime,
-        "Length":length
-    }
-)
+df = pd.DataFrame({"Name": contestNames, "Start": DateTime, "Length": length})
 
 # Save DataFrame to CSV
 df.to_csv("CodeforcesContests.csv", index=False)
